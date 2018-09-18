@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cmbs.ssm.mapper.ChargeMapper">
+    <insert id="addCharge" parameterType="com.cmbs.ssm.pojo.Charge" >
+        INSERT INTO tcharge VALUES(#{chargeCode},#{chargeName},#{charge});
+    </insert>
+
+    <select id="queryChargeByCode" parameterType="com.cmbs.ssm.pojo.Charge" resultType="com.cmbs.ssm.pojo.Charge">
+        SELECT Charge_Code chargeCode,Charge_Name chargeName,Charge charge FROM tcharge WHERE Charge_Code=#{chargeCode};
+    </select>
+
+    <update id="updateCharge" parameterType="com.cmbs.ssm.pojo.Charge">
+        UPDATE tcharge SET Charge=#{charge} WHERE Charge_Code=#{chargeCode};
+    </update>
+
+</mapper>

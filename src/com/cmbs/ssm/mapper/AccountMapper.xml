@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cmbs.ssm.mapper.AccountMapper">
+    <select id="queryAccountById" parameterType="java.lang.Integer" resultType="com.cmbs.ssm.pojo.Account">
+        SELECT Account_ID accountId, Contact_Person contactPerson,Contact_Address contactAddress,Contact_Balance contactBalance FROM taccount WHERE Account_ID=#{id};
+    </select>
+
+    <insert id="addAccount" parameterType="com.cmbs.ssm.pojo.Account" >
+        INSERT INTO taccount VALUES(NULL,#{contactPerson},#{contactAddress},#{contactBalance});
+    </insert>
+
+    <update id="updateAccountById" parameterType="com.cmbs.ssm.pojo.Account" >
+       UPDATE taccount SET Contact_Person=#{contactPerson},Contact_Address=#{contactAddress},Contact_Balance=#{contactBalance} WHERE Account_ID=#{accountId};
+    </update>
+
+    <select id="queryAccountByOthers" parameterType="com.cmbs.ssm.pojo.Account" resultType="com.cmbs.ssm.pojo.Account">
+        SELECT Account_ID accountId FROM taccount WHERE Contact_Person=#{contactPerson} AND Contact_Address=#{contactAddress} AND Contact_Balance=#{contactBalance};
+    </select>
+
+</mapper>
