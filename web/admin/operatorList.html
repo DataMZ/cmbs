@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>
+            操作员列表
+        </title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="format-detection" content="telephone=no">
+        <link rel="stylesheet" href="../css/x-admin.css" media="all">
+        <script type="text/javascript" src="../js/jquery-3.3.1.js"></script>
+        <script type="text/javascript" src="../js/utils.js"></script>
+    </head>
+    <body>
+        <div class="x-nav">
+            <span class="layui-breadcrumb">
+              <a><cite>你现在的位置：</cite></a>
+              <a><cite>操作员列表</cite></a>
+            </span>
+            <!--不用重写-->
+            <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
+        </div>
+        <div class="x-body">
+        <form class="layui-form x-center" action="" style="width:100%">
+            <div class="layui-form" style="padding-left: 15%">
+              <div class="layui-form-item">
+                  <div class="layui-input-inline" style="width:400px;">
+                      <label for="operatorName" class="layui-form-label" style="width: 25%">
+                          操作员姓名:
+                      </label>
+                      <div class="layui-input-inline" style="width: 40%;">
+                          <input type="text" id="operatorName" name="username" required lay-verify="required" class="layui-input">
+                      </div>
+                  </div>
+                    <div class="layui-input-inline" style="width:400px; margin-left: -80px">
+                        <label for="operatorId" class="layui-form-label" style="width: 25%">
+                            操作员编号:
+                        </label>
+                        <div class="layui-input-inline" style="width: 40%;">
+                            <input type="text" id="operatorId" name="username" required lay-verify="required" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-input-inline" style="width:80px;margin-left: -60px">
+                        <button type="button" onclick="search()"  class="layui-btn"  lay-submit="" lay-filter="sreach" style="height: 30px"><i class="layui-icon">&#xe615;</i></button>
+                    </div>
+              </div>
+            </div>
+        </form>
+            <xblock>
+                <button class="layui-btn layui-btn-radius layui-btn-danger" style="height: 26px" onclick="delAll()"><i class="layui-icon">&#xe640;</i>批量删除</button>
+                <span class="x-right" style="line-height:25px">共有数据：<span id="count">1</span> 条</span>
+            </xblock>
+            <div style="height: 240px">
+                <table class="layui-table" style="text-align: center;width: 70%;margin-left: 10%">
+                    <thead >
+                    <tr>
+                        <th width="5%" style="text-align: center;font-size: 18px">选中</th>
+                        <th width="5%" style="text-align: center;font-size: 18px">编号</th>
+                        <th width="9%" style="text-align: center;font-size: 18px">姓名</th>
+                        <th width="5%" style="text-align: center;font-size: 18px">权限</th>
+                        <th width="5%" style="text-align: center;font-size: 18px">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="operatorList" >
+                    </tbody>
+                </table>
+            </div>
+            <div id="page" style="margin-left: 60%" ></div>
+        </div>
+            <br /><br /><br />
+        <script src="../lib/layui/layui.js" charset="utf-8"></script>
+        <script src="../js/x-layui.js" charset="utf-8"></script>
+        <script>
+            function updatePageNum() {
+                $.ajax({
+                    url: getRootURL() + "/getCount.action",
+                    type: "POST",
+                    data: {},
+                    success: function (data) {
+                        first = data.first;
+                        last = data.last;
+                        groups = data.groups;
+                        pages = data.pages;
+                        count = data.count;
+                        $("#count").text(count);
+                        updateOperatorList();
+                    }
+                });
+            }
+
+            function updateOperatorList() {
+                //以上模块根据需要引入
+                layui.use(['laypage','laydate','element','layer'], function() {
+                    $ = layui.jquery;//jquery
+                    laydate = layui.laydate;//日期插件
+                    lement = layui.element();//面包导航
+                    layer = layui.layer;//弹出层
+                    laypage = layui.laypage;
+                    laypage({
+                        cont: 'page'
+                        , pages: pages
+                        , groups: groups
+                        , first: first
+                        , last: last
+                        , skip:true
+                        , prev: '<em><</em>'
+                        , next: '<em>></em>'
+                        , jump: function (obj) {
+                            var curr = obj.curr; //得到点击的页面
+                            $.ajax({
+                                url: getRootURL() + "/getOperatorList.action",
+                                type: "POST",
+                                data: {
+                                    startLine:groups*(curr-1),
+                                    numPerPage:groups
+                                },
+                                success: function (data) {
+                                    var tr = "";
+                                    for (var i = 0,len=data.length; i < len; i++) {
+                                        tr += "<tr id='"+data[i].id+"'>"+
+                                            "<td><input name='"+data[i].id+"' type='checkbox'/></td>" +
+                                            "<td name='id'>"+data[i].id+"</td>" +
+                                            "<td name='name'>"+data[i].name+"</td>" +
+                                            "<td name='isAdmin'>"+data[i].isAdmin+"</td>"+
+                                            "<td class=\"td-manage\">"+
+                                            "<a name=\""+data[i].id+"\" title='修改' href=\"javascript:;\" onclick=\"home_edit('修改','modOperator.html','','510',this)\" class=\"ml-5\" style=\"text-decoration:none\">"+
+                                            "<i class=\"layui-icon\">&#xe642;</i>"+
+                                            "</a>" +
+                                            "<a name=\""+data[i].id+"\" title=\"删除\" href=\"javascript:;\" onclick=\"banner_del(this,'1')\" style=\"text-decoration:none\">"+
+                                            "<i class=\"layui-icon\">&#xe640;</i>" +
+                                            "</a>"+
+                                            "</td>"+
+                                            "</tr>"
+                                    }
+                                    $("#operatorList").html(tr);
+                                }
+                            })
+                        }
+                    });
+                });
+            }
+        </script>
+        <script>
+            var first,last,groups,pages,count;
+            $(function () {
+                updatePageNum();
+                //以上模块根据需要引入
+                // updateOperatorList();
+            });
+
+            //批量删除提交
+            function delAll() {
+                layer.confirm('确认要删除吗？', function (index) {
+                    var deleteIdArr = [];
+                    $("input:checked").each(function () {
+                        deleteIdArr.push($(this).attr("name"));
+                    });
+
+                    if(deleteIdArr.length == 0) {
+                        layer.msg('请选中删除项！',
+                            {
+                                icon: 2,
+                                title: "提示"
+                            });
+                    }else {
+                        $.ajax({
+                            url:getRootURL()+"/deleteOperators.action",
+                            type:"POST",
+                            data:{
+                                ids:deleteIdArr
+                            },
+                            success:function (data) {
+                                if(data.status=="deleteErr") {
+                                    layer.alert("部分删除失败", {
+                                        icon: 2,
+                                        title: "提示"
+                                    });
+                                }else {
+                                    updatePageNum();
+                                    //以上模块根据需要引入
+                                    // updateOperatorList();
+                                    //发异步删除数据
+                                    layer.alert("已删除！", {
+                                        icon: 1,
+                                        title: "提示"
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            // 编辑
+            function home_edit(title, url, w, h,element) {
+                var elementId = element.name;
+                // https://blog.csdn.net/chw0629/article/details/80503064
+                var id = $("#"+elementId+" td[name='id']").text() ;
+                var name = $("#"+elementId+" td[name='name']").text() ;
+                var isAdmin = $("#"+elementId+" td[name='isAdmin']").text() ;
+                var data = {
+                    id:id,
+                    name:name,
+                    isAdmin:isAdmin
+                };
+                sessionStorage.setItem("operatorTmp",JSON.stringify(data));
+                x_admin_show(title, url, w, h);
+            }
+
+            /*删除*/
+            function banner_del(obj, id) {
+                layer.confirm('确认要删除吗？', function (index) {
+                    $.ajax({
+                        url:getRootURL()+"/deleteOperator.action",
+                        type:"POST",
+                        data:{
+                            id:obj.name
+                        },
+                        success:function (data) {
+                            if(data.status=="deleteErr") {
+                                layer.alert("删除失败", {
+                                    icon: 2,
+                                    title: "提示"
+                                });
+                            }else {
+                                updatePageNum();
+                                //以上模块根据需要引入
+                                // updateOperatorList();
+                                //发异步删除数据
+                                layer.alert("已删除！", {
+                                    icon: 1,
+                                    title: "提示"
+                                });
+                            }
+                        }
+                    });
+                });
+            }
+            
+            
+            
+            function updatePageNumBySearch(operatorName,operatorId) {
+                $.ajax({
+                    url: getRootURL() + "/searchOperator.action",
+                    type: "POST",
+                    data: {
+                        name:operatorName,
+                        id:operatorId
+                    },
+                    success: function (data) {
+                        first = data.first;
+                        last = data.last;
+                        groups = data.groups;
+                        pages = data.pages;
+                        count = data.count;
+                        $("#count").text(count);
+                        updateOperatorListBySearch(operatorName,operatorId);
+                    }
+                });
+            }
+
+            function updateOperatorListBySearch(operatorName,operatorId) {
+                //以上模块根据需要引入
+                layui.use(['laypage','laydate','element','layer'], function() {
+                    $ = layui.jquery;//jquery
+                    laydate = layui.laydate;//日期插件
+                    lement = layui.element();//面包导航
+                    layer = layui.layer;//弹出层
+                    laypage = layui.laypage;
+                    laypage({
+                        cont: 'page'
+                        , pages: pages
+                        , groups: groups
+                        , first: first
+                        , last: last
+                        , prev: '<em><</em>'
+                        , next: '<em>></em>'
+                        , jump: function (obj) {
+                            var curr = obj.curr; //得到点击的页面
+                            $.ajax({
+                                url: getRootURL() + "/getOperatorListBySearch.action",
+                                type: "POST",
+                                data: {
+                                    name:operatorName,
+                                    id:operatorId,
+                                    startLine:groups*(curr-1),
+                                    numPerPage:groups
+                                },
+                                success: function (data) {
+                                    var tr = "";
+                                    for (var i = 0,len=data.length; i < len; i++) {
+                                        tr += "<tr id='"+data[i].id+"'>"+
+                                            "<td><input name='"+data[i].id+"' type='checkbox'/></td>" +
+                                            "<td name='id'>"+data[i].id+"</td>" +
+                                            "<td name='name'>"+data[i].name+"</td>" +
+                                            "<td name='isAdmin'>"+data[i].isAdmin+"</td>"+
+                                            "<td class=\"td-manage\">"+
+                                            "<a name=\""+data[i].id+"\" title='修改' href=\"javascript:;\" onclick=\"home_edit('修改','modOperator.html','4','','510',this)\" class=\"ml-5\" style=\"text-decoration:none\">"+
+                                            "<i class=\"layui-icon\">&#xe642;</i>"+
+                                            "</a>" +
+                                            "<a name=\""+data[i].id+"\" title=\"删除\" href=\"javascript:;\" onclick=\"banner_del(this,'1')\" style=\"text-decoration:none\">"+
+                                            "<i class=\"layui-icon\">&#xe640;</i>" +
+                                            "</a>"+
+                                            "</td>"+
+                                            "</tr>"
+                                    }
+                                    $("#operatorList").html(tr);
+                                }
+                            })
+                        }
+                    });
+                });
+            }
+            
+            
+            function search() {
+                var operatorName = $("#operatorName").val();
+                var operatorId = $("#operatorId").val();
+                if(operatorName=="" && operatorId=="") {
+                    location.replace(location.href);
+                }else {
+                    updatePageNumBySearch(operatorName,operatorId);
+                }
+            }
+
+        </script>
+        <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          var s = document.getElementsByTagName("script")[0]; 
+          s.parentNode.insertBefore(hm, s);
+        })();
+        </script>
+    </body>
+</html>

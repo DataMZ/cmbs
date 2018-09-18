@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cmbs.ssm.mapper.CustomerMapper">
+    <select id="queryByIdTypeAndNum" parameterType="com.cmbs.ssm.pojo.Customer" resultType="com.cmbs.ssm.pojo.Customer">
+        SELECT Customer_ID customerId,ID_Type idType,ID_Number idNumber,Customer_Name customerName,Customer_Birthday customerBirthday,Customer_Sex customerSex,Customer_Address customerAddress FROM tcustomer WHERE ID_Type=#{idType} AND ID_Number=#{idNumber};
+    </select>
+
+    <insert id="addCustomer" parameterType="com.cmbs.ssm.pojo.Customer" >
+        INSERT INTO tcustomer VALUES(NULL,#{idType},#{idNumber},#{customerName},#{customerBirthday},#{customerSex},#{customerAddress});
+    </insert>
+
+    <update id="updateByIdTypeAndNum" parameterType="com.cmbs.ssm.pojo.Customer" >
+        UPDATE tcustomer SET Customer_Name=#{customerName},Customer_Birthday=#{customerBirthday},Customer_Sex=#{customerSex},Customer_Address=#{customerAddress} WHERE ID_Type=#{idType} AND ID_Number=#{idNumber};
+    </update>
+
+</mapper>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <mappers>
+        <mapper resource="com/cmbs/ssm/mapper/OperatorMapper.xml"/>
+        <mapper resource="com/cmbs/ssm/mapper/AccountMapper.xml"/>
+        <mapper resource="com/cmbs/ssm/mapper/CustomerMapper.xml"/>
+        <mapper resource="com/cmbs/ssm/mapper/UserMapper.xml"/>
+        <mapper resource="com/cmbs/ssm/mapper/MobileMapper.xml"/>
+        <mapper resource="com/cmbs/ssm/mapper/ChargeMapper.xml"/>
+        <mapper resource="com/cmbs/ssm/mapper/ChargeRuleMapper.xml"/>
+    </mappers>
+</configuration>
