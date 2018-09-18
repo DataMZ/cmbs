@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>新增操作员</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="../css/x-admin.css" media="all">
+    <link rel="stylesheet" href="../css/layui.css" media="all">
+    <script type="text/javascript" src="../js/jquery-3.3.1.js"></script>
+    <script type="text/javascript" src="../js/utils.js"></script>
+</head>
+<body>
+    <div class="x-body" style="padding-top: 10px">
+        <span style="font-size: 15px;padding-left: 10px">您现在的位置：修改操作员</span><br/>
+        <hr>
+    </div>
+    <form class="layui-form" action="">
+        <div class="layui-form-item" style="padding-left: 35px" >
+            <label for="loginId" class="layui-form-label" style="width: 14%">
+                登录ID:
+            </label>
+            <div class="layui-input-inline" style="width: 20%;">
+                <input style="background-color: #c8c8c8" type="text" id="loginId" name="username" required lay-verify="required" class="layui-input" readonly>
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span class="x-red">*</span>只包含划线、数字和字母,至少4个字符且不超过10个字符
+            </div>
+        </div>
+        <div class="layui-form-item" style="padding-left: 35px" >
+            <label for="name" class="layui-form-label" style="width: 14%">
+                姓名:
+            </label>
+            <div class="layui-input-inline" style="width: 20%;">
+                <input type="text" id="name" name="username" required lay-verify="required" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span class="x-red">*</span>只包含划线、数字、字母和汉字,不超过20个字符
+            </div>
+        </div>
+        <!--<div class="layui-form-item" style="padding-left: 35px" >-->
+            <!--<label for="name" class="layui-form-label" style="width: 14%">-->
+                <!--密码:-->
+            <!--</label>-->
+            <!--<div class="layui-input-inline" style="width: 20%;">-->
+                <!--<input type="password" id="passwd" name="username" required lay-verify="required" class="layui-input">-->
+            <!--</div>-->
+            <!--<div class="layui-form-mid layui-word-aux">-->
+                <!--<span class="x-red">*</span>只包含划线、数字和字母,至少6个字符且不超过20个字符-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<div class="layui-form-item" style="padding-left: 35px" >-->
+            <!--<label for="name" class="layui-form-label" style="width: 14%">-->
+                <!--密码确认:-->
+            <!--</label>-->
+            <!--<div class="layui-input-inline" style="width: 20%;">-->
+                <!--<input type="password" id="passwdAgain" name="username" required lay-verify="required" class="layui-input">-->
+            <!--</div>-->
+        <!--</div>-->
+        <div class="layui-form-item" style="padding-left: 35px">
+            <label class="layui-form-label" style="width: 14%">是否管理员:</label>
+            <div class="layui-input-block">
+                <input type="radio" name="admin" value="Y" title="是" >
+                <input type="radio" name="admin" value="N" title="否" checked>
+            </div>
+        </div>
+        <div class="layui-form-item" style="padding-left: 10%">
+            <button id="submit" type="button" class="layui-btn layui-btn-radius layui-btn-lg" style="width: 120px;height: 30px;background-color: #2a6496">
+                提交
+            </button>
+            <button id="clean" type="button" class="layui-btn layui-btn-radius  layui-btn-lg" style="width: 120px;height: 30px;margin-left: 50px;background-color: #2a6496">
+                全部重写
+            </button>
+        </div>
+    </form>
+
+</body>
+    <script src="../js/layui/src/layui.js" charset="utf-8"></script>
+    <script src="../js/x-layui.js" charset="utf-8"></script>
+    <script  >
+
+
+        layui.use(['form','layer','upload'], function() {
+            $ = layui.jquery;
+            var form = layui.form
+                , layer = layui.layer;
+
+            $(function () {
+                var operator = JSON.parse(sessionStorage.getItem("operatorTmp"));
+                $("#loginId").val(operator.id);
+                $("#name").val(operator.name);
+                if(operator.isAdmin == "Y") {
+                    $("input:radio[name='admin']")[0].checked=true;
+                }else {
+                    $("input:radio[name='admin']")[1].checked=true;
+                }
+                form.render("radio");
+            });
+
+
+            $("#submit").click(function () {
+                var loginId = $("#loginId").val();
+                var name = $("#name").val();
+                var isAdmin = $("input[name='admin']:checked").val();
+
+                if(name=="") {
+                    layer.alert('输入框不能为空', {
+                        icon: 2,
+                        title: "提示"
+                    });
+                }else if(!/^[_a-zA-Z0-9\u4E00-\u9FA5]{1,20}$/.test(name)){
+                    layer.alert("姓名格式不正确！", {
+                        icon: 2,
+                        title: "提示"
+                    });
+                }else {
+                    $.ajax({
+                        url:getRootURL()+"/updateOperatorNoPwd.action",
+                        type:"POST",
+                        data:{
+                            id:loginId,
+                            name:name,
+                            isAdmin:isAdmin
+                        },
+                        success:function (data) {
+                            if(data.status=="updateErr") {
+                                layer.alert("修改出错！", {
+                                    icon: 2,
+                                    title: "提示"
+                                });
+                            }else {
+                                layer.alert("修改成功！", {
+                                    icon: 1,
+                                    title: "提示"
+                                },function () {
+                                    //刷新页面
+                                    parent.window.location.href= getRootURL()+ '/admin/operatorList.html';
+                                    //获取窗口索引
+                                    var index = parent.layer.getFrameIndex(window.name);
+                                    //关闭弹出层
+                                    parent.layer.close(index);
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+
+            $("#clean").click(function () {
+                $("#name").val("");
+                $("input:radio[name='admin']")[1].checked=true;
+                form.render("radio");
+            })
+
+        });
+    </script>
+</html>

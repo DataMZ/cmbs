@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="cmbs:war exploded">
+    <output-path>D:/Program Files/apache-tomcat-8.5.32-windows-x64/apache-tomcat-8.5.32/webapps/cmbs</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="cmbs/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="cmbs" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
